@@ -90,8 +90,8 @@ export class Viewer {
       ambientColor: 0xFFFFFF,
       directIntensity: 0.8 * Math.PI, // TODO(#116)
       directColor: 0xFFFFFF,
-      bgColor1: '#ffffff',
-      bgColor2: '#353535'
+      bgColor1: '#848dfc',
+      bgColor2: '#000000'
     };
 
     this.prevTime = 0;
@@ -327,7 +327,7 @@ export class Viewer {
     this.updateDisplay();
 
     window.content = this.content;
-    console.info('[glTF Viewer] THREE.Scene exported as `window.content`.');
+    console.info('[JRPC Viewer] THREE.Scene exported as `window.content`.');
     this.printGraph(this.content);
 
   }

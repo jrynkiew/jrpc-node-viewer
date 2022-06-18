@@ -73,7 +73,7 @@ body {
 
 header {
   display: flex;
-  background: #0FF0878F;
+  background: #000000;
   padding: 0 2em;
   height: 4rem;
   line-height: 4rem;
@@ -90,7 +90,7 @@ header {
 header h1,
 header .item,
 header .separator {
-  color: #000000;
+  color: #ffffff;
   font-weight: 300;
   line-height: 4rem;
   margin: 0;

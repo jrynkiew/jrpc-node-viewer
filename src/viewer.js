@@ -26,6 +26,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 
 import { GUI } from 'dat.gui';
 
@@ -78,9 +79,9 @@ export class Viewer {
       playbackSpeed: 1.0,
       actionStates: {},
       camera: DEFAULT_CAMERA,
-      wireframe: false,
+      wireframe: true,
       skeleton: false,
-      grid: false,
+      grid: true,
 
       // Lights
       addLights: true,
@@ -90,7 +91,7 @@ export class Viewer {
       ambientColor: 0xFFFFFF,
       directIntensity: 0.8 * Math.PI, // TODO(#116)
       directColor: 0xFFFFFF,
-      bgColor1: '#848dfc',
+      bgColor1: '#000000',
       bgColor2: '#000000'
     };
 
@@ -144,13 +145,19 @@ export class Viewer {
     this.gridHelper = null;
     this.axesHelper = null;
 
+    this.transformControls = new TransformControls(this.defaultCamera, this.renderer.domElement);
+   
     this.addAxesHelper();
     this.addGUI();
     if (options.kiosk) this.gui.close();
 
     this.animate = this.animate.bind(this);
     requestAnimationFrame( this.animate );
+
     window.addEventListener('resize', this.resize.bind(this), false);
+    this.transformControls.addEventListener('mouseDown', this.mouseDown.bind(this), false);
+    this.transformControls.addEventListener('mouseUp', this.mouseUp.bind(this), false);
+    window.addEventListener('keydown', this.keydown.bind(this), false);
   }
 
   animate (time) {
@@ -172,10 +179,32 @@ export class Viewer {
 
     this.renderer.render( this.scene, this.activeCamera );
     if (this.state.grid) {
-      this.axesCamera.position.copy(this.defaultCamera.position)
-      this.axesCamera.lookAt(this.axesScene.position)
+      this.axesCamera.position.copy(this.defaultCamera.position);
+      this.axesCamera.lookAt(this.axesScene.position);
       this.axesRenderer.render( this.axesScene, this.axesCamera );
     }
+  }
+
+  keydown (event) {
+    switch (event.key) {
+      case 'g':
+        this.transformControls.setMode('translate');
+        break;
+      case 'r':
+        this.transformControls.setMode('rotate');
+        break;
+      case 's':
+        this.transformControls.setMode('scale');
+        break;
+    }
+  }
+
+  mouseDown () {
+    this.controls.enabled = false;
+  }
+
+  mouseUp () {
+    this.controls.enabled = true;
   }
 
   resize () {
@@ -193,6 +222,8 @@ export class Viewer {
   }
 
   load ( url, rootPath, assetMap ) {
+
+    console.log(url, rootPath, assetMap);
 
     const baseURL = LoaderUtils.extractUrlBase(url);
 
@@ -303,8 +334,10 @@ export class Viewer {
     this.axesCorner.scale.set(size, size, size);
 
     this.controls.saveState();
-
+  
+    this.scene.add(this.transformControls);
     this.scene.add(object);
+    this.transformControls.attach(object);
     this.content = object;
 
     this.state.addLights = true;

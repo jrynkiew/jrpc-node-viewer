@@ -152,8 +152,31 @@ class App {
   }
 }
 
+async function createFile () {
+  let response = await fetch('https://jrpc.pl/assets/models/star.glb');
+  let data = await response.blob();
+  let metadata = {
+    type: 'model/gltf-binary'
+  };
+
+  const file = new File([data], 'star.glb', metadata);
+
+  return file;
+}
+
+function createFileMap (file) {
+  const fileMap = new Map();
+  fileMap.set('star.glb', file);
+  console.log(fileMap);
+  console.log(file.name);
+  return fileMap;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
   const app = new App(document.body, location);
+
+  const filePromise = createFile();
+  filePromise.then((file) => app.view('star.glb', '', createFileMap(file)));
 
 });
